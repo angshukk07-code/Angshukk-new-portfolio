@@ -297,7 +297,7 @@ function initGoalsRoadmap() {
 
   const goalsData = {
     short: [
-      { title: 'Excel in Class 9 Academics', icon: '📚', desc: 'Achieve outstanding results in core subjects through daily discipline and focused study habits.' },
+      { title: 'Improve at Football & Guitar Solos', icon: '⚽🎸', desc: 'Dedicated to elevating match performance on the pitch and mastering electric guitar solos with precision and emotion.' },
       { title: 'Elevate Football Performance', icon: '⚽', desc: 'Refine agility, dribbling, precision passing, and match stamina in team training.' },
       { title: 'Master Advanced Guitar Techniques', icon: '🎸', desc: 'Expand chord repertoire, fingerpicking patterns, and solo performance capabilities.' },
       { title: 'Skill Competitions & Learning', icon: '🏆', desc: 'Participate in inter-school events, coding workshops, and leadership seminars.' }
