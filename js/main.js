@@ -303,8 +303,7 @@ function initGoalsRoadmap() {
       { title: 'Skill Competitions & Learning', icon: '🏆', desc: 'Participate in inter-school events, coding workshops, and leadership seminars.' }
     ],
     long: [
-      { title: 'Build a Successful Career Path', icon: '🚀', desc: 'Combine academic rigor and technology interests while nurturing lifelong sports and musical passions.' },
-      { title: 'Inspire & Lead Others', icon: '🌟', desc: 'Serve as a positive role model through unwavering dedication, sportsmanship, and continuous self-improvement.' }
+      { title: 'Stay Determined', icon: '🔥', desc: 'Maintain unwavering dedication, grit, and continuous self-improvement across all academic, athletic, and musical pursuits.' }
     ]
   };
 
