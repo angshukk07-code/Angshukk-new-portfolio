@@ -95,10 +95,15 @@
           A passionate Class 9 student driven by academic excellence, music, sports, and leadership. I believe that discipline, teamwork, and consistency are the ultimate keys to success.
         </p>
 
-        <!-- Current BGM Playing Indicator -->
-        <div id="bgm-status-banner" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1.2rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-full); margin-bottom: 1.5rem; width: fit-content;">
-          <span style="animation: pulse 1.5s infinite;">🎵</span>
-          <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-gold);" id="bgm-chord-name">Background Music: "Creep" by Radiohead (Guitar Cover)</span>
+        <!-- Current BGM Playing Indicator & Synchronized Chorus Lyrics -->
+        <div id="bgm-status-banner" class="bgm-banner-card">
+          <div class="bgm-banner-header">
+            <span class="bgm-pulse-icon">🎵</span>
+            <span id="bgm-chord-name" class="bgm-title-text">Radiohead - "Creep" (Chorus Cover)</span>
+          </div>
+          <div id="bgm-lyrics-display" class="bgm-lyrics-text">
+            🎤 "But I'm a creep... I'm a weirdo... What the hell am I doing here? I don't belong here..."
+          </div>
         </div>
 
         <div class="hero-cta">

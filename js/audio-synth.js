@@ -66,12 +66,28 @@ class GuitarSynth {
       'Cm': [130.81, 155.56, 196.00, 261.63, 311.13]
     };
 
-    // Radiohead "Creep" Progression
+    // Radiohead "Creep" Chorus Chord Progression & Synchronized Lyrics
     this.creepChords = [
-      { name: 'G Major', notes: [196.00, 246.94, 293.66, 392.00] },
-      { name: 'B Major', notes: [246.94, 311.13, 369.99, 493.88] },
-      { name: 'C Major', notes: [261.63, 329.63, 392.00, 523.25] },
-      { name: 'C Minor', notes: [261.63, 311.13, 392.00, 523.25] }
+      {
+        name: 'G Major',
+        lyric: '🎤 "But I\'m a creep... I\'m a weirdo..."',
+        notes: [196.00, 246.94, 293.66, 392.00]
+      },
+      {
+        name: 'B Major',
+        lyric: '🎸 "What the hell am I doing here?..."',
+        notes: [246.94, 311.13, 369.99, 493.88]
+      },
+      {
+        name: 'C Major',
+        lyric: '✨ "I don\'t belong here..."',
+        notes: [261.63, 329.63, 392.00, 523.25]
+      },
+      {
+        name: 'C Minor',
+        lyric: '💫 "I don\'t belong here... no, I don\'t belong here."',
+        notes: [261.63, 311.13, 392.00, 523.25]
+      }
     ];
 
     // Voice tracking per string (active sound nodes)
@@ -482,6 +498,11 @@ class GuitarSynth {
       clearTimeout(this.bgmTimer);
       this.bgmTimer = null;
     }
+    const bgmLyric = document.getElementById('bgm-lyrics-display');
+    if (bgmLyric) {
+      bgmLyric.textContent = '🎵 Click "Play Creep BGM" to sing along!';
+      bgmLyric.classList.remove('lyric-glow');
+    }
   }
 
   scheduleCreepArpeggio() {
@@ -498,7 +519,13 @@ class GuitarSynth {
 
     const bgmLabel = document.getElementById('bgm-chord-name');
     if (bgmLabel) {
-      bgmLabel.textContent = `Creep: ${currentChord.name}`;
+      bgmLabel.textContent = `Radiohead - Creep (${currentChord.name})`;
+    }
+
+    const bgmLyric = document.getElementById('bgm-lyrics-display');
+    if (bgmLyric && currentChord.lyric) {
+      bgmLyric.textContent = currentChord.lyric;
+      bgmLyric.classList.add('lyric-glow');
     }
 
     this.creepStep++;
