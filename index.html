@@ -349,10 +349,15 @@
       <div class="guitar-container">
         <div class="guitar-header">
           <div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.5rem;">Interactive Fretboard Synthesizer</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary);">Click or drag across strings to pluck notes, or click chord presets below!</p>
+            <h3 style="font-family: var(--font-heading); font-size: 1.6rem; display: flex; align-items: center; gap: 0.6rem;">
+              <span>🎸</span> Virtual 22-Fret Interactive Guitar
+            </h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">
+              Click/drag frets, slide, bend, or strum vertically. Real-time pitch calculation & chord detection!
+            </p>
           </div>
 
+          <!-- Sound Tone Presets -->
           <div class="tone-selector">
             <button class="tone-btn active" data-tone="acoustic">Warm Acoustic</button>
             <button class="tone-btn" data-tone="electric">Electric Clean</button>
@@ -360,57 +365,128 @@
           </div>
         </div>
 
-        <!-- Virtual Guitar Neck & Strings -->
-        <div class="guitar-neck">
-          <div class="guitar-strings">
-            <div class="string-row" data-string="E1">
-              <span class="string-label">E (High)</span>
-              <div class="string-wire-container">
-                <div class="string-wire"></div>
-              </div>
-              <span class="strum-btn">Pluck</span>
+        <!-- Expressive Techniques & Real-time Chord HUD Bar -->
+        <div class="guitar-controls-bar">
+          <div class="tech-controls">
+            <button class="tech-btn" id="tech-palm-mute" title="Palm Mute Technique (Dampens decay and high frequencies)">
+              <span>🤫</span> Palm Mute
+            </button>
+            <button class="tech-btn" id="tech-harmonics" title="Natural Harmonics (Frets 5, 7, 12 chime tones)">
+              <span>✨</span> Harmonics
+            </button>
+            <button class="tech-btn" id="tech-sustain" title="Sustain Mode (Holds notes longer)">
+              <span>♾️</span> Sustain
+            </button>
+            <button class="tech-btn" id="guitar-mute-all-btn" title="Mute/Dampen all active strings">
+              <span>✋</span> Stop All
+            </button>
+          </div>
+
+          <div class="chord-hud-card" id="chord-hud-card">
+            <span class="hud-label">CHORD DETECTED</span>
+            <span class="hud-value" id="detected-chord-text">Ready to Play</span>
+          </div>
+        </div>
+
+        <!-- 22-FRET REALISTIC WOODEN FRETBOARD VISUALIZER -->
+        <div class="fretboard-scroll-container">
+          <div class="fretboard-wood" id="guitar-fretboard">
+            <!-- Fretboard Header with Fret Numbers & Inlay Markers -->
+            <div class="fret-header-row">
+              <div class="string-header-label">STRING</div>
+              <div class="fret-num-cell nut-cell">NUT (0)</div>
+              <!-- Frets 1 to 22 -->
+              <div class="fret-num-cell">1</div>
+              <div class="fret-num-cell">2</div>
+              <div class="fret-num-cell inlay-single">3<span>•</span></div>
+              <div class="fret-num-cell">4</div>
+              <div class="fret-num-cell inlay-single">5<span>•</span></div>
+              <div class="fret-num-cell">6</div>
+              <div class="fret-num-cell inlay-single">7<span>•</span></div>
+              <div class="fret-num-cell">8</div>
+              <div class="fret-num-cell inlay-single">9<span>•</span></div>
+              <div class="fret-num-cell">10</div>
+              <div class="fret-num-cell">11</div>
+              <div class="fret-num-cell inlay-double">12<span>••</span></div>
+              <div class="fret-num-cell">13</div>
+              <div class="fret-num-cell">14</div>
+              <div class="fret-num-cell inlay-single">15<span>•</span></div>
+              <div class="fret-num-cell">16</div>
+              <div class="fret-num-cell inlay-single">17<span>•</span></div>
+              <div class="fret-num-cell">18</div>
+              <div class="fret-num-cell inlay-single">19<span>•</span></div>
+              <div class="fret-num-cell">20</div>
+              <div class="fret-num-cell inlay-single">21<span>•</span></div>
+              <div class="fret-num-cell">22</div>
             </div>
 
-            <div class="string-row" data-string="B2">
-              <span class="string-label">B</span>
-              <div class="string-wire-container">
-                <div class="string-wire"></div>
+            <!-- 6 Guitar Strings (E4 High E down to E2 Low E) -->
+            <!-- String 1: E4 (High E) -->
+            <div class="fretboard-string-row" data-string-idx="0" data-string-name="E4">
+              <div class="string-title">E <span>High</span></div>
+              <div class="fret-cell open-fret" data-fret="0" title="Open High E (E4)">
+                <div class="string-wire string-gauge-1"></div>
+                <span class="open-label">OPEN</span>
               </div>
-              <span class="strum-btn">Pluck</span>
+              <!-- Frets 1 to 22 generated dynamically or via template -->
+              <div class="fret-cells-container"></div>
             </div>
 
-            <div class="string-row" data-string="G3">
-              <span class="string-label">G</span>
-              <div class="string-wire-container">
-                <div class="string-wire"></div>
+            <!-- String 2: B3 -->
+            <div class="fretboard-string-row" data-string-idx="1" data-string-name="B3">
+              <div class="string-title">B</div>
+              <div class="fret-cell open-fret" data-fret="0" title="Open B (B3)">
+                <div class="string-wire string-gauge-2"></div>
+                <span class="open-label">OPEN</span>
               </div>
-              <span class="strum-btn">Pluck</span>
+              <div class="fret-cells-container"></div>
             </div>
 
-            <div class="string-row" data-string="D4">
-              <span class="string-label">D</span>
-              <div class="string-wire-container">
-                <div class="string-wire"></div>
+            <!-- String 3: G3 -->
+            <div class="fretboard-string-row" data-string-idx="2" data-string-name="G3">
+              <div class="string-title">G</div>
+              <div class="fret-cell open-fret" data-fret="0" title="Open G (G3)">
+                <div class="string-wire string-gauge-3"></div>
+                <span class="open-label">OPEN</span>
               </div>
-              <span class="strum-btn">Pluck</span>
+              <div class="fret-cells-container"></div>
             </div>
 
-            <div class="string-row" data-string="A5">
-              <span class="string-label">A</span>
-              <div class="string-wire-container">
-                <div class="string-wire"></div>
+            <!-- String 4: D3 -->
+            <div class="fretboard-string-row" data-string-idx="3" data-string-name="D3">
+              <div class="string-title">D</div>
+              <div class="fret-cell open-fret" data-fret="0" title="Open D (D3)">
+                <div class="string-wire string-gauge-4"></div>
+                <span class="open-label">OPEN</span>
               </div>
-              <span class="strum-btn">Pluck</span>
+              <div class="fret-cells-container"></div>
             </div>
 
-            <div class="string-row" data-string="E6">
-              <span class="string-label">E (Low)</span>
-              <div class="string-wire-container">
-                <div class="string-wire"></div>
+            <!-- String 5: A2 -->
+            <div class="fretboard-string-row" data-string-idx="4" data-string-name="A2">
+              <div class="string-title">A</div>
+              <div class="fret-cell open-fret" data-fret="0" title="Open A (A2)">
+                <div class="string-wire string-gauge-5"></div>
+                <span class="open-label">OPEN</span>
               </div>
-              <span class="strum-btn">Pluck</span>
+              <div class="fret-cells-container"></div>
+            </div>
+
+            <!-- String 6: E2 (Low E) -->
+            <div class="fretboard-string-row" data-string-idx="5" data-string-name="E2">
+              <div class="string-title">E <span>Low</span></div>
+              <div class="fret-cell open-fret" data-fret="0" title="Open Low E (E2)">
+                <div class="string-wire string-gauge-6"></div>
+                <span class="open-label">OPEN</span>
+              </div>
+              <div class="fret-cells-container"></div>
             </div>
           </div>
+        </div>
+
+        <!-- Keyboard Controls & Hints -->
+        <div class="keyboard-hints-bar">
+          <span>⌨️ Keyboard: Keys 1-9 & 0 for Frets • Q, W, E, R, T, Y for Strings • Space: Mute • Shift: Sustain</span>
         </div>
 
         <!-- Chord Presets -->

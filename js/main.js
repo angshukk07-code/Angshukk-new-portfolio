@@ -238,57 +238,275 @@ function initSkillsSection() {
   });
 }
 
-/* --- 6. GUITAR INTERACTION LISTENERS --- */
+/* --- 6. 22-FRET INTERACTIVE VIRTUAL GUITAR CONTROLLER --- */
 function initGuitarInteractions() {
-  const stringRows = document.querySelectorAll('.string-row');
-  const chordBtns = document.querySelectorAll('.chord-btn');
+  const fretboardContainer = document.getElementById('guitar-fretboard');
   const toneBtns = document.querySelectorAll('.tone-btn');
+  const techPalmMuteBtn = document.getElementById('tech-palm-mute');
+  const techHarmonicsBtn = document.getElementById('tech-harmonics');
+  const techSustainBtn = document.getElementById('tech-sustain');
+  const muteAllBtn = document.getElementById('guitar-mute-all-btn');
+  const chordHudText = document.getElementById('detected-chord-text');
+  const chordBtns = document.querySelectorAll('.chord-btn');
 
-  // String Pluck on hover & click
+  if (!fretboardContainer) return;
+
+  // Active Fretboard State (String index 0..5 -> Fret number 0..22; null if unplayed)
+  const activeFretState = [null, null, null, null, null, null];
+  let isPointerDown = false;
+  let lastDraggedString = null;
+  let lastDraggedFret = null;
+  let lastDragTime = 0;
+  let lastPointerX = 0;
+
+  /* 1. Generate 22 Frets for each of the 6 string rows */
+  const stringRows = document.querySelectorAll('.fretboard-string-row');
   stringRows.forEach(row => {
-    const stringName = row.dataset.string;
+    const stringIdx = parseInt(row.dataset.stringIdx, 10);
+    const container = row.querySelector('.fret-cells-container');
+    if (!container) return;
 
-    const pluck = () => {
-      if (window.guitarSynth) {
-        window.guitarSynth.pluckString(stringName);
-      }
-      const wire = row.querySelector('.string-wire');
-      if (wire) {
-        wire.classList.add('vibrating');
-        setTimeout(() => wire.classList.remove('vibrating'), 400);
-      }
-    };
+    // Clear existing cells if any
+    container.innerHTML = '';
 
-    row.addEventListener('click', pluck);
-    row.addEventListener('mouseenter', (e) => {
-      if (e.buttons === 1) pluck();
-    });
+    for (let fret = 1; fret <= 22; fret++) {
+      const fretCell = document.createElement('div');
+      fretCell.className = 'fret-cell';
+      fretCell.dataset.stringIdx = stringIdx;
+      fretCell.dataset.fret = fret;
+      fretCell.title = `String ${stringIdx + 1}, Fret ${fret}`;
+
+      const wire = document.createElement('div');
+      wire.className = `string-wire string-gauge-${stringIdx + 1}`;
+      fretCell.appendChild(wire);
+
+      container.appendChild(fretCell);
+    }
   });
 
-  // Chord Strum Buttons
-  chordBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const chord = btn.dataset.chord;
-      if (window.guitarSynth) {
-        window.guitarSynth.strumChord(chord);
-      }
-      btn.classList.add('playing');
-      setTimeout(() => btn.classList.remove('playing'), 600);
+  /* Helper: Highlight Fret Cell visually */
+  function highlightFret(stringIdx, fretNum, duration = 1200) {
+    const cell = document.querySelector(`.fret-cell[data-string-idx="${stringIdx}"][data-fret="${fretNum}"]`);
+    if (!cell) return;
+
+    cell.classList.add('active-fret');
+    const wire = cell.querySelector('.string-wire');
+    if (wire) {
+      wire.classList.add('vibrating');
+      setTimeout(() => wire.classList.remove('vibrating'), 350);
+    }
+
+    if (!window.guitarSynth || !window.guitarSynth.isSustainMode) {
+      setTimeout(() => {
+        cell.classList.remove('active-fret');
+      }, duration);
+    }
+  }
+
+  /* Helper: Clear all active fret highlights */
+  function clearAllFretHighlights() {
+    document.querySelectorAll('.fret-cell.active-fret').forEach(cell => {
+      cell.classList.remove('active-fret');
     });
+    for (let i = 0; i < 6; i++) activeFretState[i] = null;
+    updateChordHud();
+  }
+
+  /* Helper: Update Dynamic Chord HUD */
+  function updateChordHud() {
+    if (!chordHudText || !window.guitarSynth) return;
+
+    const activeNotes = [];
+    activeFretState.forEach((fretNum, stringIdx) => {
+      if (fretNum !== null && fretNum >= 0) {
+        const details = window.guitarSynth.getNoteDetails(stringIdx, fretNum);
+        activeNotes.push(details);
+      }
+    });
+
+    const result = window.guitarSynth.detectActiveChord(activeNotes);
+    if (result.chordName) {
+      chordHudText.textContent = result.chordName;
+      chordHudText.style.color = '#00f2fe';
+    } else {
+      chordHudText.textContent = 'Ready to Play';
+      chordHudText.style.color = '#fff';
+    }
+  }
+
+  /* 2. Play Fret Note Handler */
+  function triggerFretPlay(stringIdx, fretNum, e = null, isSlide = false) {
+    if (!window.guitarSynth) return;
+
+    // Calculate dynamic velocity based on drag speed / mouse movement
+    const now = performance.now();
+    const timeDelta = Math.max(1, now - lastDragTime);
+    let velocity = 0.8;
+
+    if (e && e.movementY) {
+      const speed = Math.abs(e.movementY) / timeDelta;
+      velocity = Math.min(1.0, Math.max(0.4, speed * 2.5));
+    }
+    lastDragTime = now;
+
+    // Trigger Synthesis
+    window.guitarSynth.playFretNote(stringIdx, fretNum, velocity, isSlide);
+
+    // Update state & UI
+    activeFretState[stringIdx] = fretNum;
+    highlightFret(stringIdx, fretNum);
+    updateChordHud();
+
+    lastDraggedString = stringIdx;
+    lastDraggedFret = fretNum;
+  }
+
+  /* 3. Mouse & Pointer Delegation on Fretboard */
+  fretboardContainer.addEventListener('pointerdown', (e) => {
+    const cell = e.target.closest('.fret-cell');
+    if (!cell) return;
+
+    isPointerDown = true;
+    lastPointerX = e.clientX;
+    const stringIdx = parseInt(cell.dataset.stringIdx, 10);
+    const fretNum = parseInt(cell.dataset.fret, 10);
+
+    triggerFretPlay(stringIdx, fretNum, e, false);
   });
 
-  // Tone Switcher (Acoustic / Electric / Ambient)
+  fretboardContainer.addEventListener('pointermove', (e) => {
+    if (!isPointerDown) return;
+
+    const cell = e.target.closest('.fret-cell');
+    if (!cell) return;
+
+    const stringIdx = parseInt(cell.dataset.stringIdx, 10);
+    const fretNum = parseInt(cell.dataset.fret, 10);
+
+    // Slide on same string vs Strum across strings
+    if (stringIdx !== lastDraggedString || fretNum !== lastDraggedFret) {
+      const isSlide = (stringIdx === lastDraggedString && fretNum !== lastDraggedFret);
+      triggerFretPlay(stringIdx, fretNum, e, isSlide);
+    } else if (e.clientX && lastPointerX) {
+      // Pitch Bend on horizontal drag shift
+      const bendDelta = (e.clientX - lastPointerX) * 4; // cents
+      if (Math.abs(bendDelta) > 5) {
+        window.guitarSynth.playFretNote(stringIdx, fretNum, 0.75, true, bendDelta);
+      }
+    }
+  });
+
+  window.addEventListener('pointerup', () => {
+    isPointerDown = false;
+    lastDraggedString = null;
+    lastDraggedFret = null;
+  });
+
+  /* 4. Tone Selector Presets */
   toneBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       toneBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const tone = btn.dataset.tone;
-      if (window.guitarSynth) {
-        window.guitarSynth.setTone(tone);
-      }
+      if (window.guitarSynth) window.guitarSynth.setTone(tone);
     });
   });
+
+  /* 5. Technique Buttons Toggles */
+  if (techPalmMuteBtn) {
+    techPalmMuteBtn.addEventListener('click', () => {
+      if (!window.guitarSynth) return;
+      window.guitarSynth.isPalmMute = !window.guitarSynth.isPalmMute;
+      techPalmMuteBtn.classList.toggle('active', window.guitarSynth.isPalmMute);
+    });
+  }
+
+  if (techHarmonicsBtn) {
+    techHarmonicsBtn.addEventListener('click', () => {
+      if (!window.guitarSynth) return;
+      window.guitarSynth.isHarmonics = !window.guitarSynth.isHarmonics;
+      techHarmonicsBtn.classList.toggle('active', window.guitarSynth.isHarmonics);
+    });
+  }
+
+  if (techSustainBtn) {
+    techSustainBtn.addEventListener('click', () => {
+      if (!window.guitarSynth) return;
+      window.guitarSynth.isSustainMode = !window.guitarSynth.isSustainMode;
+      techSustainBtn.classList.toggle('active', window.guitarSynth.isSustainMode);
+      if (!window.guitarSynth.isSustainMode) clearAllFretHighlights();
+    });
+  }
+
+  if (muteAllBtn) {
+    muteAllBtn.addEventListener('click', () => {
+      if (window.guitarSynth) window.guitarSynth.stopAllVoices();
+      clearAllFretHighlights();
+    });
+  }
+
+  /* 6. Instant Strum Chord Preset Buttons */
+  chordBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chordName = btn.dataset.chord;
+      if (!window.guitarSynth) return;
+
+      const presetFrets = window.guitarSynth.chordFretPresets[chordName];
+      if (presetFrets) {
+        clearAllFretHighlights();
+        presetFrets.forEach((fretNum, stringIdx) => {
+          if (fretNum >= 0) {
+            activeFretState[stringIdx] = fretNum;
+            highlightFret(stringIdx, fretNum, 2000);
+          }
+        });
+
+        window.guitarSynth.strumFretboardChord(presetFrets, 'down', 0.85);
+        updateChordHud();
+      }
+
+      btn.classList.add('playing');
+      setTimeout(() => btn.classList.remove('playing'), 600);
+    });
+  });
+
+  /* 7. Keyboard Shortcuts Support */
+  let currentStringSelection = 0; // Default String 1 (High E)
+  const stringKeys = { 'KeyQ': 0, 'KeyW': 1, 'KeyE': 2, 'KeyR': 3, 'KeyT': 4, 'KeyY': 5 };
+
+  document.addEventListener('keydown', (e) => {
+    // Ignore keyboard shortcuts if user is typing in an input
+    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+    // String Selection via Q, W, E, R, T, Y
+    if (stringKeys[e.code] !== undefined) {
+      currentStringSelection = stringKeys[e.code];
+      const targetCell = document.querySelector(`.fret-cell[data-string-idx="${currentStringSelection}"][data-fret="0"]`);
+      if (targetCell) triggerFretPlay(currentStringSelection, 0);
+      return;
+    }
+
+    // Fret selection via numbers 1..9 & 0
+    if (e.key >= '0' && e.key <= '9') {
+      const fretNum = e.key === '0' ? 10 : parseInt(e.key, 10);
+      triggerFretPlay(currentStringSelection, fretNum);
+      return;
+    }
+
+    // Space: Mute All
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (window.guitarSynth) window.guitarSynth.stopAllVoices();
+      clearAllFretHighlights();
+    }
+
+    // Shift: Toggle Sustain
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+      if (techSustainBtn) techSustainBtn.click();
+    }
+  });
 }
+
 
 /* --- 7. GOALS ROADMAP TIMELINE TOGGLE --- */
 function initGoalsRoadmap() {

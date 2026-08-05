@@ -699,86 +699,269 @@ body {
   font-weight: 700;
 }
 
-/* Interactive Guitar Neck Visualizer */
-.guitar-neck {
-  background: linear-gradient(180deg, #1c1410 0%, #2e1f18 100%);
-  border-radius: 14px;
-  padding: 1.5rem 1rem;
-  border: 2px solid #5c3a21;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
-  margin-bottom: 2rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.guitar-strings {
+/* --- 22-FRET REALISTIC WOODEN GUITAR FRETBOARD --- */
+.guitar-controls-bar {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  position: relative;
-}
-
-.string-row {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  cursor: pointer;
-  padding: 0.3rem 0;
-  transition: background var(--transition-fast);
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.string-row:hover {
-  background: rgba(245, 158, 11, 0.1);
-  border-radius: 8px;
+.tech-controls {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
-.string-label {
-  width: 40px;
+.tech-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: var(--text-secondary);
   font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 1rem;
-  color: var(--accent-gold);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.string-wire-container {
-  flex-grow: 1;
-  height: 24px;
+.tech-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+
+.tech-btn.active {
+  background: var(--gradient-guitar);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+
+.chord-hud-card {
   display: flex;
   align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 1.25rem;
+  background: rgba(15, 22, 41, 0.9);
+  border: 1px solid var(--accent-cyan);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+}
+
+.hud-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--accent-cyan);
+}
+
+.hud-value {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+/* Fretboard Scrollable Container */
+.fretboard-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 16px;
+  border: 3px solid #4a2c17;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1.5rem;
+  -webkit-overflow-scrolling: touch;
+  background: #180d08;
+}
+
+.fretboard-wood {
+  display: min-content;
+  min-width: 100%;
+  background: linear-gradient(180deg, #2b1810 0%, #1a0e09 50%, #2b1810 100%);
+  padding: 0.5rem 0.75rem 1rem 0.75rem;
+  user-select: none;
+  touch-action: pan-x pan-y;
+}
+
+/* Header Row (Fret Numbers & Markers) */
+.fret-header-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #5c3a21;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.string-header-label {
+  width: 75px;
+  min-width: 75px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--accent-gold);
+  text-align: center;
+}
+
+.fret-num-cell {
+  width: 48px;
+  min-width: 48px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #94a3b8;
   position: relative;
 }
 
-.string-wire {
-  width: 100%;
-  background: linear-gradient(90deg, #cbd5e1, #94a3b8, #cbd5e1);
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-  transition: transform 0.05s ease-in-out;
+.fret-num-cell.nut-cell {
+  width: 60px;
+  min-width: 60px;
+  color: var(--accent-cyan);
 }
 
-.string-row[data-string="E6"] .string-wire { height: 5px; }
-.string-row[data-string="A5"] .string-wire { height: 4px; }
-.string-row[data-string="D4"] .string-wire { height: 3px; }
-.string-row[data-string="G3"] .string-wire { height: 2.5px; }
-.string-row[data-string="B2"] .string-wire { height: 2px; }
-.string-row[data-string="E1"] .string-wire { height: 1.5px; }
+.fret-num-cell.inlay-single span,
+.fret-num-cell.inlay-double span {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #f8fafc;
+  font-size: 1.2rem;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* String Rows */
+.fretboard-string-row {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  position: relative;
+}
+
+.string-title {
+  width: 75px;
+  min-width: 75px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--accent-gold);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.string-title span {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.fret-cells-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Fret Cells */
+.fret-cell {
+  width: 48px;
+  min-width: 48px;
+  height: 38px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-right: 2px solid linear-gradient(180deg, #94a3b8, #cbd5e1);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Metal Fret Wire Dividers */
+.fret-cell::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #e2e8f0 0%, #64748b 50%, #e2e8f0 100%);
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Open String Nut Column (Fret 0) */
+.fret-cell.open-fret {
+  width: 60px;
+  min-width: 60px;
+  background: rgba(0, 242, 254, 0.06);
+  border-right: 4px solid #e2e8f0;
+}
+
+.open-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.7;
+}
+
+/* Metallic String Wires across frets */
+.string-wire {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, #f8fafc, #94a3b8, #cbd5e1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* String Gauges (Thicknesses) */
+.string-gauge-1 { height: 1.5px; } /* High E */
+.string-gauge-2 { height: 2.0px; } /* B */
+.string-gauge-3 { height: 2.5px; } /* G */
+.string-gauge-4 { height: 3.2px; } /* D */
+.string-gauge-5 { height: 4.0px; } /* A */
+.string-gauge-6 { height: 5.0px; } /* Low E */
+
+/* Active Fret Pressed / Playing States */
+.fret-cell.active-fret {
+  background: rgba(245, 158, 11, 0.35) !important;
+  box-shadow: inset 0 0 15px rgba(245, 158, 11, 0.8) !important;
+}
+
+.fret-cell:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
 
 .string-wire.vibrating {
-  animation: stringVibrate 0.15s infinite alternate;
+  animation: stringVibrate 0.12s infinite alternate;
 }
 
 @keyframes stringVibrate {
-  0% { transform: translateY(-3px); }
-  100% { transform: translateY(3px); }
+  0% { transform: translateY(-50%) translateY(-2.5px); }
+  100% { transform: translateY(-50%) translateY(2.5px); }
 }
 
-.strum-btn {
-  padding: 0.3rem 0.8rem;
+.keyboard-hints-bar {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  color: var(--accent-gold);
-  font-size: 0.75rem;
-  font-weight: 700;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-glass);
 }
 
 /* Chord Preset Buttons */
