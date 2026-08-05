@@ -4,6 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initBackgroundCanvas();
+  initMobileMenu();
   initThemeToggle();
   initAudioControls();
   initCreepBgmControls();
@@ -13,6 +14,62 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initRonaldoQuoteSpeech();
 });
+
+/* --- 0. MOBILE NAVIGATION MENU --- */
+function initMobileMenu() {
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+  if (!menuBtn || !overlay) return;
+
+  let isOpen = false;
+
+  function toggleMenu() {
+    isOpen = !isOpen;
+    menuBtn.classList.toggle('active', isOpen);
+    overlay.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  function closeMenu() {
+    if (!isOpen) return;
+    isOpen = false;
+    menuBtn.classList.remove('active');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  menuBtn.addEventListener('click', toggleMenu);
+
+  // Close menu when a nav link is clicked
+  mobileLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      closeMenu();
+    });
+  });
+
+  // Close menu when clicking the overlay backdrop
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay || e.target === overlay.querySelector('::before')) {
+      closeMenu();
+    }
+  });
+
+  // Close menu on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen) {
+      closeMenu();
+    }
+  });
+
+  // Close menu on window resize past mobile breakpoint
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768 && isOpen) {
+      closeMenu();
+    }
+  });
+}
+
 
 /* --- 1. DYNAMIC BACKGROUND PARTICLES CANVAS --- */
 function initBackgroundCanvas() {
@@ -301,7 +358,7 @@ function initScrollAnimations() {
   });
 }
 
-/* --- 9. RONALDO QUOTE - CLICK TO HEAR SPEECH SYNTHESIS --- */
+/* --- 9. RONALDO QUOTE - CLICK TO PLAY AUDIO CLIP --- */
 function initRonaldoQuoteSpeech() {
   const quoteCard = document.getElementById('ronaldo-quote-card');
   const speakerHint = document.getElementById('quote-speaker-hint');
@@ -309,62 +366,52 @@ function initRonaldoQuoteSpeech() {
   const speakerIcon = document.getElementById('quote-speaker-icon');
   if (!quoteCard) return;
 
-  let isSpeaking = false;
+  // Preload the Ronaldo audio clip
+  const ronaldoAudio = new Audio('assets/audio/ronaldo-quote.mp3');
+  ronaldoAudio.preload = 'auto';
+  let isPlaying = false;
 
   quoteCard.addEventListener('click', () => {
-    if (isSpeaking) return;
-
-    // Cancel any existing speech
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(
-      'Maybe they hate me... because I am too good.'
-    );
-
-    // Try to find a deep male voice (prefer English male voices)
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v =>
-      v.lang.startsWith('en') && v.name.toLowerCase().includes('male')
-    ) || voices.find(v =>
-      v.lang.startsWith('en') && (v.name.includes('Daniel') || v.name.includes('James') || v.name.includes('David') || v.name.includes('Google UK English Male'))
-    ) || voices.find(v => v.lang.startsWith('en'));
-
-    if (preferredVoice) utterance.voice = preferredVoice;
-
-    // Confident, deep tone - like CR7
-    utterance.rate = 0.85;
-    utterance.pitch = 0.7;
-    utterance.volume = 1.0;
-
-    // Visual feedback: show audio bars, glow card
-    utterance.onstart = () => {
-      isSpeaking = true;
-      quoteCard.classList.add('speaking');
-      if (speakerHint) speakerHint.style.display = 'none';
-      if (audioBars) audioBars.style.display = 'flex';
-      if (speakerIcon) speakerIcon.textContent = '🗣️';
-    };
-
-    utterance.onend = () => {
-      isSpeaking = false;
+    if (isPlaying) {
+      // If already playing, stop and reset
+      ronaldoAudio.pause();
+      ronaldoAudio.currentTime = 0;
+      isPlaying = false;
       quoteCard.classList.remove('speaking');
       if (speakerHint) speakerHint.style.display = 'flex';
       if (audioBars) audioBars.style.display = 'none';
       if (speakerIcon) speakerIcon.textContent = '🔊';
-    };
+      return;
+    }
 
-    utterance.onerror = () => {
-      isSpeaking = false;
-      quoteCard.classList.remove('speaking');
-      if (speakerHint) speakerHint.style.display = 'flex';
-      if (audioBars) audioBars.style.display = 'none';
-    };
+    // Reset to start and play
+    ronaldoAudio.currentTime = 0;
 
-    window.speechSynthesis.speak(utterance);
+    ronaldoAudio.play().then(() => {
+      isPlaying = true;
+      quoteCard.classList.add('speaking');
+      if (speakerHint) speakerHint.style.display = 'none';
+      if (audioBars) audioBars.style.display = 'flex';
+      if (speakerIcon) speakerIcon.textContent = '🗣️';
+    }).catch(err => {
+      console.warn('Audio playback failed:', err);
+    });
   });
 
-  // Preload voices (some browsers load async)
-  if (window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = () => {};
-  }
+  ronaldoAudio.addEventListener('ended', () => {
+    isPlaying = false;
+    quoteCard.classList.remove('speaking');
+    if (speakerHint) speakerHint.style.display = 'flex';
+    if (audioBars) audioBars.style.display = 'none';
+    if (speakerIcon) speakerIcon.textContent = '🔊';
+  });
+
+  ronaldoAudio.addEventListener('error', () => {
+    isPlaying = false;
+    quoteCard.classList.remove('speaking');
+    if (speakerHint) speakerHint.style.display = 'flex';
+    if (audioBars) audioBars.style.display = 'none';
+    if (speakerIcon) speakerIcon.textContent = '🔊';
+    console.warn('Failed to load Ronaldo audio clip.');
+  });
 }

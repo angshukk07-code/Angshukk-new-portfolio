@@ -1086,8 +1086,174 @@ body {
   font-size: 0.85rem;
 }
 
+/* --- MOBILE HAMBURGER MENU --- */
+.mobile-menu-btn {
+  display: none;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  z-index: 1001;
+}
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 22px;
+  height: 22px;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-origin: center;
+}
+
+/* Hamburger → X animation */
+.mobile-menu-btn.active .hamburger-icon span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.mobile-menu-btn.active .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.mobile-menu-btn.active .hamburger-icon span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* --- MOBILE MENU OVERLAY --- */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.mobile-menu-overlay.open {
+  pointer-events: all;
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(7, 9, 19, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.mobile-menu-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 5rem 2rem 2rem;
+  z-index: 1;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+.mobile-menu-overlay.open .mobile-menu-panel {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.mobile-menu-header {
+  margin-bottom: 3rem;
+}
+
+.mobile-menu-header .nav-brand {
+  font-size: 1.5rem;
+}
+
+.mobile-menu-header .nav-avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 1.2rem;
+}
+
+.mobile-nav-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.mobile-nav-links li {
+  width: 100%;
+}
+
+.mobile-nav-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+}
+
+.mobile-nav-links a:hover,
+.mobile-nav-links a:active {
+  color: var(--accent-cyan);
+  background: rgba(0, 242, 254, 0.08);
+  border-color: rgba(0, 242, 254, 0.25);
+  transform: scale(1.02);
+}
+
+.mobile-menu-footer {
+  margin-top: 3rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 /* --- RESPONSIVE MEDIA QUERIES --- */
+
+/* ===== TABLET (max-width: 992px) ===== */
 @media (max-width: 992px) {
+  .section-padding {
+    padding: 4rem 0;
+  }
+
+  .section-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 2.4rem;
+  }
+
+  /* Hero */
   .hero-grid, .about-grid, .football-grid {
     grid-template-columns: 1fr;
   }
@@ -1096,6 +1262,40 @@ body {
     font-size: 3rem;
   }
 
+  .hero-card-wrapper {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Guitar */
+  .guitar-container {
+    padding: 2rem 1.25rem;
+  }
+
+  .guitar-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chord-presets {
+    gap: 0.75rem;
+  }
+
+  .chord-btn {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  /* Football */
+  .football-container {
+    padding: 2rem 1.25rem;
+  }
+
+  #football-canvas {
+    height: 300px;
+  }
+
+  /* Timeline (Goals) */
   .roadmap-timeline::before {
     left: 20px;
   }
@@ -1114,22 +1314,637 @@ body {
   .timeline-item:nth-child(even) .timeline-dot {
     left: 10px;
   }
+
+  /* Quote */
+  .quote-card {
+    padding: 3rem 2rem;
+  }
+
+  .quote-text {
+    font-size: 1.8rem;
+  }
 }
 
+/* ===== MOBILE (max-width: 768px) ===== */
 @media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  .container {
+    width: 92%;
+    padding: 0 0.5rem;
+  }
+
+  .section-padding {
+    padding: 3rem 0;
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+  }
+
+  /* === Navbar === */
+  .navbar {
+    width: 94%;
+    padding: 0.6rem 1rem;
+    top: 0.75rem;
+  }
+
   .nav-links {
     display: none;
   }
 
-  .section-title {
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .nav-brand span {
+    font-size: 1.1rem;
+  }
+
+  .nav-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  /* Hide the "Creep" BGM text label on mobile, keep icon */
+  #creep-bgm-text {
+    display: none;
+  }
+
+  #creep-bgm-btn {
+    padding: 0.4rem 0.75rem !important;
+  }
+
+  /* === Hero === */
+  .hero {
+    min-height: auto;
+    padding-top: 5.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .hero-title {
     font-size: 2.2rem;
   }
 
-  .quote-text {
-    font-size: 1.6rem;
+  .hero-description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-cta .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.9rem 1.5rem;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+  }
+
+  .stat-item h3 {
+    font-size: 1.4rem;
+  }
+
+  .stat-item p {
+    font-size: 0.75rem;
+  }
+
+  #bgm-status-banner {
+    padding: 0.4rem 0.9rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  #bgm-status-banner #bgm-chord-name {
+    font-size: 0.75rem !important;
+  }
+
+  .hero-card-wrapper {
+    max-width: 320px;
+  }
+
+  .hero-avatar-large {
+    width: 120px;
+    height: 120px;
+  }
+
+  .hero-avatar-inner {
+    font-size: 3rem;
+  }
+
+  .hero-card {
+    padding: 1.75rem;
+  }
+
+  /* === About === */
+  .about-text-card {
+    padding: 1.5rem;
+  }
+
+  .about-text-card p {
+    font-size: 0.95rem;
+  }
+
+  .education-box {
+    padding: 1.25rem;
   }
 
   .values-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .value-card {
+    padding: 1.25rem;
+  }
+
+  .value-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+  }
+
+  /* === Skills === */
+  .skills-tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .skill-card {
+    padding: 1.25rem;
+  }
+
+  /* === Guitar === */
+  .guitar-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .guitar-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .guitar-neck {
+    padding: 1rem 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .string-label {
+    width: 30px;
+    font-size: 0.85rem;
+  }
+
+  .string-row {
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .strum-btn {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .tone-selector {
+    gap: 0.25rem;
+  }
+
+  .tone-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .chord-presets {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chord-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .chord-btn span {
+    font-size: 0.65rem;
+  }
+
+  /* === Football === */
+  .football-container {
+    padding: 1.5rem 1rem;
+  }
+
+  #football-canvas {
+    height: 260px;
+  }
+
+  .football-stats-card {
+    padding: 1.5rem;
+  }
+
+  .football-stats-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .attr-item {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  .attr-stars {
+    font-size: 0.8rem;
+  }
+
+  .hud-pill {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  /* === Goals Timeline === */
+  .goals-toggle {
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .timeline-item {
+    margin-bottom: 2rem;
+  }
+
+  .timeline-card {
+    padding: 1.5rem;
+  }
+
+  .timeline-card h3 {
+    font-size: 1.15rem;
+  }
+
+  .timeline-card p {
+    font-size: 0.85rem;
+  }
+
+  /* === Quote === */
+  .quote-card {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .quote-mark {
+    font-size: 3rem;
+  }
+
+  .quote-text {
+    font-size: 1.4rem;
+    margin: 1rem 0;
+  }
+
+  .quote-author {
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+  }
+
+  /* === Strengths & Achievements === */
+  .about-grid {
+    gap: 1.5rem;
+  }
+
+  /* === Footer === */
+  .footer {
+    padding: 2.5rem 0 1.5rem;
+  }
+
+  .footer-content h3 {
+    font-size: 1.4rem !important;
+  }
+
+  .footer-quote {
+    font-size: 0.9rem;
+  }
+
+  /* === Buttons (touch-friendly) === */
+  .btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    min-width: 38px;
+    min-height: 38px;
   }
 }
+
+/* ===== SMALL MOBILE (max-width: 480px) ===== */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .container {
+    width: 94%;
+  }
+
+  .section-padding {
+    padding: 2.5rem 0;
+  }
+
+  .section-title {
+    font-size: 1.7rem;
+  }
+
+  .section-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+  }
+
+  /* Navbar */
+  .navbar {
+    width: 96%;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .nav-brand {
+    gap: 0.5rem;
+  }
+
+  .nav-brand span {
+    font-size: 0.95rem;
+  }
+
+  .nav-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .nav-actions {
+    gap: 0.4rem;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+    min-width: 34px;
+    min-height: 34px;
+  }
+
+  #creep-bgm-btn {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Hero */
+  .hero {
+    padding-top: 5rem;
+  }
+
+  .hero-title {
+    font-size: 1.85rem;
+  }
+
+  .hero-description {
+    font-size: 0.9rem;
+  }
+
+  .hero-stats {
+    gap: 0.5rem;
+  }
+
+  .stat-item h3 {
+    font-size: 1.15rem;
+  }
+
+  .stat-item p {
+    font-size: 0.65rem;
+  }
+
+  .hero-avatar-large {
+    width: 100px;
+    height: 100px;
+  }
+
+  .hero-avatar-inner {
+    font-size: 2.5rem;
+  }
+
+  .hero-card {
+    padding: 1.5rem;
+  }
+
+  .badge-tag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+  }
+
+  /* About */
+  .about-text-card {
+    padding: 1.25rem;
+  }
+
+  .value-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .value-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+  }
+
+  .value-info h4 {
+    font-size: 0.95rem;
+  }
+
+  .value-info p {
+    font-size: 0.8rem;
+  }
+
+  /* Guitar */
+  .guitar-container {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .guitar-neck {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .string-label {
+    width: 24px;
+    font-size: 0.75rem;
+  }
+
+  .chord-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  /* Football */
+  #football-canvas {
+    height: 220px;
+  }
+
+  .football-stats-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .attr-item {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  /* Quote */
+  .quote-card {
+    padding: 2rem 1.25rem;
+  }
+
+  .quote-text {
+    font-size: 1.2rem;
+  }
+
+  .quote-mark {
+    font-size: 2.5rem;
+  }
+
+  .quote-author {
+    font-size: 0.75rem;
+  }
+
+  /* Goals Timeline */
+  .roadmap-timeline::before {
+    left: 14px;
+  }
+
+  .timeline-item {
+    padding-left: 2.25rem !important;
+    margin-bottom: 1.5rem;
+  }
+
+  .timeline-item:nth-child(odd) .timeline-dot,
+  .timeline-item:nth-child(even) .timeline-dot {
+    left: 6px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .timeline-card {
+    padding: 1.25rem;
+  }
+
+  .timeline-card h3 {
+    font-size: 1rem;
+  }
+
+  /* Mobile menu links */
+  .mobile-nav-links a {
+    font-size: 1rem;
+    padding: 0.85rem 1.25rem;
+  }
+}
+
+/* ===== SAFE AREA / NOTCH SUPPORT ===== */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .navbar {
+    padding-top: calc(0.75rem + env(safe-area-inset-top));
+  }
+  
+  .mobile-menu-panel {
+    padding-top: calc(5rem + env(safe-area-inset-top));
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  }
+
+  .footer {
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ===== TOUCH DEVICE HOVER FIX ===== */
+@media (hover: none) {
+  .glass-card:hover {
+    border-color: var(--border-glass);
+    box-shadow: var(--shadow-subtle);
+    transform: none;
+  }
+
+  .btn-primary:hover,
+  .btn-guitar:hover,
+  .btn-football:hover {
+    transform: none;
+  }
+
+  .chord-btn:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .quote-card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  /* Active states for touch */
+  .glass-card:active {
+    border-color: var(--border-glass-glow);
+    transform: scale(0.98);
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+
+  .chord-btn:active {
+    transform: scale(0.95);
+    background: var(--gradient-guitar);
+    color: #fff;
+  }
+}
+
+/* ===== REDUCED MOTION PREFERENCE ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
