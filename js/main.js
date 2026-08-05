@@ -263,6 +263,13 @@ function initGuitarInteractions() {
   const stringRows = document.querySelectorAll('.fretboard-string-row');
   stringRows.forEach(row => {
     const stringIdx = parseInt(row.dataset.stringIdx, 10);
+
+    // Explicitly set stringIdx on open fret cell (NUT / Fret 0)
+    const openCell = row.querySelector('.open-fret');
+    if (openCell) {
+      openCell.dataset.stringIdx = stringIdx;
+    }
+
     const container = row.querySelector('.fret-cells-container');
     if (!container) return;
 
@@ -283,6 +290,16 @@ function initGuitarInteractions() {
       container.appendChild(fretCell);
     }
   });
+
+  /* Helper: Get String Index and Fret Number safely from element */
+  function getCellData(cell) {
+    if (!cell) return null;
+    const stringRow = cell.closest('.fretboard-string-row');
+    const stringIdx = parseInt(cell.dataset.stringIdx !== undefined ? cell.dataset.stringIdx : (stringRow ? stringRow.dataset.stringIdx : 0), 10);
+    const fretNum = parseInt(cell.dataset.fret, 10);
+    if (isNaN(stringIdx) || isNaN(fretNum)) return null;
+    return { stringIdx, fretNum };
+  }
 
   /* Helper: Highlight Fret Cell visually */
   function highlightFret(stringIdx, fretNum, duration = 1200) {
@@ -366,12 +383,13 @@ function initGuitarInteractions() {
     const cell = e.target.closest('.fret-cell');
     if (!cell) return;
 
+    const data = getCellData(cell);
+    if (!data) return;
+
     isPointerDown = true;
     lastPointerX = e.clientX;
-    const stringIdx = parseInt(cell.dataset.stringIdx, 10);
-    const fretNum = parseInt(cell.dataset.fret, 10);
 
-    triggerFretPlay(stringIdx, fretNum, e, false);
+    triggerFretPlay(data.stringIdx, data.fretNum, e, false);
   });
 
   fretboardContainer.addEventListener('pointermove', (e) => {
@@ -380,8 +398,10 @@ function initGuitarInteractions() {
     const cell = e.target.closest('.fret-cell');
     if (!cell) return;
 
-    const stringIdx = parseInt(cell.dataset.stringIdx, 10);
-    const fretNum = parseInt(cell.dataset.fret, 10);
+    const data = getCellData(cell);
+    if (!data) return;
+
+    const { stringIdx, fretNum } = data;
 
     // Slide on same string vs Strum across strings
     if (stringIdx !== lastDraggedString || fretNum !== lastDraggedFret) {
