@@ -68,30 +68,10 @@ class GuitarSynth {
 
     // Radiohead "Creep" Chorus Progression & Synchronized Vocal Melody & Lyrics
     this.creepChords = [
-      {
-        name: 'G Major',
-        lyric: '🎤 "But I\'m a creep... I\'m a weirdo..."',
-        notes: [196.00, 246.94, 293.66, 392.00],
-        vocalMelody: [493.88, 493.88, 493.88, 493.88, 440.00, 392.00, 493.88, 392.00]
-      },
-      {
-        name: 'B Major',
-        lyric: '🎸 "What the hell am I doing here?..."',
-        notes: [246.94, 311.13, 369.99, 493.88],
-        vocalMelody: [622.25, 622.25, 622.25, 622.25, 587.33, 554.37, 493.88, 493.88]
-      },
-      {
-        name: 'C Major',
-        lyric: '✨ "I don\'t belong here..."',
-        notes: [261.63, 329.63, 392.00, 523.25],
-        vocalMelody: [659.25, 659.25, 659.25, 587.33, 523.25, 493.88, 523.25, 587.33]
-      },
-      {
-        name: 'C Minor',
-        lyric: '💫 "I don\'t belong here... no, I don\'t belong here."',
-        notes: [261.63, 311.13, 392.00, 523.25],
-        vocalMelody: [622.25, 622.25, 622.25, 587.33, 523.25, 392.00, 493.88, 523.25]
-      }
+      { name: 'G Major', notes: [196.00, 246.94, 293.66, 392.00] },
+      { name: 'B Major', notes: [246.94, 311.13, 369.99, 493.88] },
+      { name: 'C Major', notes: [261.63, 329.63, 392.00, 523.25] },
+      { name: 'C Minor', notes: [261.63, 311.13, 392.00, 523.25] }
     ];
 
     // Voice tracking per string (active sound nodes)
@@ -502,53 +482,7 @@ class GuitarSynth {
       clearTimeout(this.bgmTimer);
       this.bgmTimer = null;
     }
-    const bgmLyric = document.getElementById('bgm-lyrics-display');
-    if (bgmLyric) {
-      bgmLyric.textContent = '🎵 Click "Play Creep BGM" to sing along!';
-      bgmLyric.classList.remove('lyric-glow');
-    }
-  }
 
-  /* Synthesize a realistic acoustic grand piano tone for vocal melody layer */
-  playPianoNote(freq, duration = 1.6, volume = 0.28) {
-    if (this.isMuted) return;
-    this.initContext();
-
-    const now = this.ctx.currentTime;
-
-    // Piano Sound Architecture: Fundamental Sine + Warm Harmonics
-    const osc1 = this.ctx.createOscillator();
-    const osc2 = this.ctx.createOscillator();
-    const gainNode = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
-
-    osc1.type = 'sine';
-    osc2.type = 'triangle';
-
-    osc1.frequency.setValueAtTime(freq, now);
-    osc2.frequency.setValueAtTime(freq * 2, now); // 2nd harmonic overtone
-
-    // Acoustic Piano Lowpass Filter
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(3600, now);
-    filter.frequency.exponentialRampToValueAtTime(500, now + duration);
-
-    // Piano Hammer Attack Envelope
-    gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.linearRampToValueAtTime(volume, now + 0.005);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-    osc1.connect(filter);
-    osc2.connect(filter);
-    filter.connect(gainNode);
-
-    if (this.compressor) gainNode.connect(this.compressor);
-    if (this.reverbConvolver) gainNode.connect(this.reverbConvolver);
-
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + duration + 0.05);
-    osc2.stop(now + duration + 0.05);
   }
 
   scheduleCreepArpeggio() {
@@ -563,22 +497,6 @@ class GuitarSynth {
 
     // Pluck guitar arpeggio note
     this.pluckNote(targetNoteFreq, 1.8, 0.22);
-
-    // Play Piano Vocal Melody note
-    if (currentChord.vocalMelody && currentChord.vocalMelody[noteIndex]) {
-      this.playPianoNote(currentChord.vocalMelody[noteIndex], 1.4, 0.28);
-    }
-
-    const bgmLabel = document.getElementById('bgm-chord-name');
-    if (bgmLabel) {
-      bgmLabel.textContent = `Radiohead - Creep (${currentChord.name})`;
-    }
-
-    const bgmLyric = document.getElementById('bgm-lyrics-display');
-    if (bgmLyric && currentChord.lyric) {
-      bgmLyric.textContent = currentChord.lyric;
-      bgmLyric.classList.add('lyric-glow');
-    }
 
     this.creepStep++;
 

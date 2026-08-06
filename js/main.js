@@ -535,13 +535,14 @@ function initGoalsRoadmap() {
 
   const goalsData = {
     short: [
-      { title: 'Improve at Football & Guitar Solos', icon: '⚽🎸', desc: 'Dedicated to elevating match performance on the pitch and mastering electric guitar solos with precision and emotion.' },
-      { title: 'Elevate Football Performance', icon: '⚽', desc: 'Refine agility, dribbling, precision passing, and match stamina in team training.' },
-      { title: 'Master Advanced Guitar Techniques', icon: '🎸', desc: 'Expand chord repertoire, fingerpicking patterns, and solo performance capabilities.' },
-      { title: 'Skill Competitions & Learning', icon: '🏆', desc: 'Participate in inter-school events, coding workshops, and leadership seminars.' }
+      { title: 'Score More Goals Than Ronaldo', icon: '⚽', desc: 'Okay maybe not Ronaldo, but at least more than last week. The bar is low, just like my grades.' },
+      { title: 'Learn Stairway to Heaven on Guitar', icon: '🎸', desc: 'Currently stuck on the intro. Have been for 3 months. But hey, progress is progress... right?' },
+      { title: 'Survive Class 9 Exams', icon: '📚', desc: 'The absolute bare minimum. Just enough to keep my parents from confiscating my football and guitar.' },
+      { title: 'Perfect My Napping Technique', icon: '😴', desc: 'Achieve the legendary skill of sleeping with eyes open during math class. Almost there.' }
     ],
     long: [
-      { title: 'Stay Determined', icon: '🔥', desc: 'Maintain unwavering dedication, grit, and continuous self-improvement across all academic, athletic, and musical pursuits.' }
+      { title: 'Become a Pro Footballer or Rock Star', icon: '🌟', desc: 'Haven\'t decided yet. Either way, studying is definitely not in the plan. Maybe both? A footballer who plays guitar at halftime.' },
+      { title: 'Never Grow Up', icon: '🎯', desc: 'Stay lazy, stay chill, keep vibing. Adulting looks overrated anyway.' }
     ]
   };
 
